@@ -1,32 +1,13 @@
-#TEST FOR MULTIPLE IMAGES.
-######## Image Object Detection Using Tensorflow-trained Classifier #########
-#
-# Author: Evan Juras
-# Date: 1/15/18
-# Description: 
-# This program uses a TensorFlow-trained classifier to perform object detection.
-# It loads the classifier uses it to perform object detection on an image.
-# It draws boxes and scores around the objects of interest in the image.
-
-## Some of the code is copied from Google's example at
-## https://github.com/tensorflow/models/blob/master/research/object_detection/object_detection_tutorial.ipynb
-
-## and some is copied from Dat Tran's example at
-## https://github.com/datitran/object_detector_app/blob/master/object_detection_app.py
-
-## but I changed it to make it more understandable to me.
-
-# Import packages
 import os
 import cv2
 import numpy as np
 import tensorflow as tf
 import sys
 
-# This is needed since the notebook is stored in the object_detection folder.
+
 sys.path.append("..")
 
-# Import utilites
+
 from utils import label_map_util
 from utils import visualization_utils as vis_util
 path="E:\\TextDetection\\TextDetection2019\\models-master\\research\\object_detection\\Frames"
@@ -44,20 +25,18 @@ else:
 MODEL_NAME = FLAGS.model 
 
 TEST_IMAGE_FOLDER= 'Frames'
-            # Grab path to current working directory
+            
 CWD_PATH = os.getcwd()
 
-            # Path to frozen detection graph .pb file, which contains the model that is used
-            # for object detection.
+            
 PATH_TO_CKPT = os.path.join(CWD_PATH,MODEL_NAME,'frozen_inference_graph.pb')
 
-            # Path to label map file
+            
 PATH_TO_LABELS = os.path.join(CWD_PATH,'data','label_map.pbtxt')
 
-            # Path to image
+            
          
-
-            # Number of classes the object detector can identify
+# Number of classes the object detector can identify
 NUM_CLASSES = 2
 
 # Load the label map.
@@ -130,58 +109,48 @@ for r,d,f in os.walk(path):
                 min_score_thresh=0.60)
 
             # All the results have been drawn on image. Now display the image.
-            #cv2.imshow('SIMPLE TEXT', image)
+            cv2.imshow('UrduEnglish', image)
             cv2.imwrite(detected_image_path+IMAGE_NAME,image)
             print('\n')
             print(IMAGE_NAME+' SAVED!\n ')
             print('\n')
             cv2.waitKey(300)
-            line_path="E:\\TextDetection\\TextDetection2019\\models-master\\research\\object_detection\\Detected Images Text\\lines_UE\\"
             height,width,x = image.shape
-            print(width)
-            print("\n"+str(height))
+            # print(width)
+            # print("\n"+str(height))
         
-            #input("")
-            #scores =  np.squeeze(scores)
-            boxes = boxes[scores>0.6]
-            #print(scores)
-            # classes = str(classes)
-            # classes = classes[:2]
-            #classes = classes[scores>0.6]
-            _classes = str(classes)
-            _classes = classes[2:]
+            #boxes = boxes[scores>0.6]
+            box = []
+            _class = []
+            for j in scores:
+                if j>0.6:
+                    box.append(boxes[j])
+                    _class.append(classes[j])
 
             for box in boxes:
-                _class = _classes[:3]
-                _classes = _classes[3:]
-                # _class = classes[:3]
-                # classes = classes[3:]
-                # ymin = box[0]
-                # xmin = box[1]
-                # ymax = box[2]
-                # xmax = box[3]
                 ymin, xmin, ymax, xmax = box
                 
                 ymin =int(ymin*height)
                 ymax = int(ymax*height)
                 xmin = int(xmin*width)
                 xmax = int(xmax*width)
-                print(xmin, " ", xmax, " ", ymin, " ", ymax, " ", _class)
+                print(xmin, " ", xmax, " ", ymin, " ", ymax)
               
-                # print(image)
-                #line = np.array(xmax-xmin, ymax-ymin)
-                #line = tf.image.crop_to_bounding_box(image, int(ymin), int(xmin),int(ymax - ymin), int(xmax - xmin))
                 temp_img = cv2.imread(PATH_TO_IMAGE)
-                #line = np.array(image[xmin:xmax,ymin:ymax])
+                
                 line = temp_img[ymin:ymax,xmin:xmax]
                 i=i+1
-                #cv2.imwrite(line_path+IMAGE_NAME+str(i),line)
-                line.shape
-                cv2.imshow("",line)
-                #plt.imshow(line)
-                cv2.waitKey(0)        
+                if _class==1.0:
+                    line_path="E:\\TextDetection\\TextDetection2019\\models-master\\research\\object_detection\\Detected Images Text\\Urdu_Lines\\"            
+                    cv2.imwrite(line_path+IMAGE_NAME+str(i),line)
+                    cv2.imshow("Urdu",line)
+                elif _class==2.0:
+                    line_path="E:\\TextDetection\\TextDetection2019\\models-master\\research\\object_detection\\Detected Images Text\\English_Lines\\"
+                    cv2.imwrite(line_path+IMAGE_NAME+str(i),line)
+                    cv2.imshow("English",line)
+                    
+                cv2.waitKey(200)        
             cv2.destroyAllWindows()
 
 print('Process Successfully Completed! \n'+'Images are located in the directory : '+detected_image_path)
 
-#AHSAN GOHEER 
